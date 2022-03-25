@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update and upgrade existing packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install Apache2 package
+      apt: 
+        name: apache2 
+        state: latest
+    
+    - name: Configure Apache2 service
+      service:
+        name: httpd
+        state: started
