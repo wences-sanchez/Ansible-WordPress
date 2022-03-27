@@ -1,18 +1,118 @@
 ---
 - hosts: all
   become: yes
+  vars_prompt:
+    - name: mysql_password
+      prompt: Write your password for the variable mysql_password
+  vars:
+    # Web about socket encryption https://dev.mysql.com/doc/refman/5.7/en/connection-options.html
+    - mysql_socket_path: /var/run/mysqld/mysqld.sock
   tasks:
-    - name: Update and upgrade existing packages
-      apt:
-        update_cache: yes
-        upgrade: dist
+    # - name: Update and upgrade existing packages
+    #   apt:
+    #     update_cache: yes
+    #     upgrade: dist
 
     - name: Install Apache2 package
       apt: 
         name: apache2 
         state: latest
+        update_cache: yes
     
     - name: Configure Apache2 service
       service:
-        name: httpd
+        name: apache2
         state: started
+
+    - name: Install MySQL
+      block:
+        - name: Install MySQL
+          apt:
+            name: 
+              - mysql-client-8.0
+              - mysql-server-8.0
+              - mysql-server
+          notify:
+            - Restart mysql service
+      rescue:
+        - name: Remove lock to allow installation
+          file:
+            path: /var/lib/dpkg/lock
+            state: absent
+        - name: Install MySQL again
+          apt:
+            name:
+              - mysql-client-8.0
+              - mysql-server-8.0
+              - mysql-server
+    
+    - name: Install additional MySQL package to manage it better
+      apt:
+        name: python3-pymysql
+
+    - name: Insert template my.cnf
+      template:
+        src: my.cnf.j2
+        dest: /root/.my.cnf
+      
+    # Beginning of steps taken of mysql_secure_installation
+    - name: start mysql here
+      service:
+        name: mysql
+        state: restarted
+
+    - name: Remove users with empty names
+      mysql_user:
+        name: ""
+        login_unix_socket: "{{ mysql_socket_path }}"
+        state: absent
+
+    - name: Remove root user remote access
+      mysql_user:
+        name: root
+        host: 
+          - localhost
+          - 127.0.0.1
+          - ::1
+        login_unix_socket: "{{ mysql_socket_path }}"
+        state: absent
+
+    - name: Remove test database
+      mysql_db:
+        login_unix_socket: "{{ mysql_socket_path }}"
+        name: I_am_cool
+        state: absent
+    # End of MySQL securitize installation
+
+    - name: Install PHP
+      apt:
+        name:
+          - php
+          - php-mysql
+        state: latest
+    
+    - name: Copy PHP dummy file
+      copy:
+        src: info.php 
+        dest: /var/www/html/info.php
+
+    - name: Create database Wordpress
+      mysql_db:
+        name: wordpress_db
+        state: present
+        login_unix_socket: "{{ mysql_socket_path }}"
+
+    - name: Create a user
+      mysql_user:
+        name: wp_user
+        host: localhost
+        state: present
+        password: cool
+        priv: 'wordpress_db.*:ALL'
+        login_unix_socket: "{{ mysql_socket_path }}"
+
+  handlers:
+    - name: Restart mysql service
+      service:
+        name: mysqld
+        state: restarted
