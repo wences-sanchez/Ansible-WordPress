@@ -61,7 +61,9 @@
         dest: /root/.my.cnf
       
     # Beginning of steps taken of mysql_secure_installation
-    
+    - name: Execute make_mysql_secure role
+      include_role:
+        name: make_mysql_secure
     # End of MySQL securitize installation
 
     - name: Install PHP
