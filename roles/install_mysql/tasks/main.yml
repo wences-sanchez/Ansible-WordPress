@@ -8,7 +8,7 @@
           - mysql-server-8.0
           - mysql-server
       notify:
-        - Restart mysql service
+        - Restart mysql
   rescue:
     - name: Remove lock to allow installation
       file:
