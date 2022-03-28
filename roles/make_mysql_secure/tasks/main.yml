@@ -1,9 +1,4 @@
 ---
-- name: Start mysql in this step
-  service:
-    name: mysql
-    state: restarted
-
 - name: Remove users with empty names
   mysql_user:
     name: ""
