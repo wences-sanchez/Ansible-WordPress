@@ -52,6 +52,7 @@
 
     - name: Insert template my.cnf
       template:
+        mode: '400'
         src: my.cnf.j2
         dest: /root/.my.cnf
       
