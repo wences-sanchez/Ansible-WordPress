@@ -1,2 +1,32 @@
 ---
-# tasks file for install_mysql
+- name: Install MySQL
+  block:
+    - name: Install MySQL
+      apt:
+        name: 
+          - mysql-client-8.0
+          - mysql-server-8.0
+          - mysql-server
+      notify:
+        - Restart mysql service
+  rescue:
+    - name: Remove lock to allow installation
+      file:
+        path: /var/lib/dpkg/lock
+        state: absent
+    - name: Install MySQL again
+      apt:
+        name:
+          - mysql-client-8.0
+          - mysql-server-8.0
+          - mysql-server
+
+- name: Install additional MySQL package to manage it better
+  apt:
+    name: python3-pymysql
+
+- name: Insert template my.cnf
+  template:
+    mode: '400'
+    src: my.cnf.j2
+    dest: /root/.my.cnf
