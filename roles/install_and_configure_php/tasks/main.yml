@@ -1,0 +1,13 @@
+---
+# tasks file for install_and_configure_php
+- name: Install PHP
+  apt:
+    name:
+      - php
+      - php-mysql
+    state: latest
+
+- name: Copy PHP dummy file
+  copy:
+    src: info.php 
+    dest: /var/www/html/info.php
