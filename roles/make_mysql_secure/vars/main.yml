@@ -1,0 +1,3 @@
+---
+# vars file for make_mysql_secure
+mysql_socket_path: /var/run/mysqld/mysqld.sock
