@@ -61,32 +61,7 @@
         dest: /root/.my.cnf
       
     # Beginning of steps taken of mysql_secure_installation
-    - name: Start mysql in this step
-      service:
-        name: mysql
-        state: restarted
-
-    - name: Remove users with empty names
-      mysql_user:
-        name: ""
-        login_unix_socket: "{{ mysql_socket_path }}"
-        state: absent
-
-    - name: Remove root user remote access
-      mysql_user:
-        name: root
-        host: 
-          - localhost
-          - 127.0.0.1
-          - ::1
-        login_unix_socket: "{{ mysql_socket_path }}"
-        state: absent
-
-    - name: Remove test database
-      mysql_db:
-        login_unix_socket: "{{ mysql_socket_path }}"
-        name: I_am_cool
-        state: absent
+    
     # End of MySQL securitize installation
 
     - name: Install PHP
