@@ -4,6 +4,7 @@
     name: ""
     login_unix_socket: "{{ mysql_socket_path }}"
     state: absent
+  notify: Restart mysql
 
 - name: Remove root user remote access
   mysql_user:
@@ -14,6 +15,7 @@
       - ::1
     login_unix_socket: "{{ mysql_socket_path }}"
     state: absent
+  notify: Restart mysql
 
 - name: Remove test database
   mysql_db:

@@ -1,6 +1,6 @@
 ---
 # handlers file for make_mysql_secure
-- name: Start mysql in this step
+- name: Restart mysql
   service:
     name: mysql
     state: restarted
